@@ -1,0 +1,50 @@
+{
+  "dist/vue-signature-canvas.common.js": {
+    "bundled": 3836,
+    "minified": 3807,
+    "gzipped": 1480
+  },
+  "dist/vue-signature-canvas.js": {
+    "bundled": 3780,
+    "minified": 3756,
+    "gzipped": 1485
+  },
+  "dist/vue-signature-canvas.esm.js": {
+    "bundled": 3706,
+    "minified": 3680,
+    "gzipped": 1432,
+    "treeshaked": {
+      "rollup": {
+        "code": 3349,
+        "import_statements": 57
+      },
+      "webpack": {
+        "code": 4380
+      }
+    }
+  },
+  "dist\\vue-signature-canvas.common.js": {
+    "bundled": 2974,
+    "minified": 2608,
+    "gzipped": 990
+  },
+  "dist\\vue-signature-canvas.js": {
+    "bundled": 3053,
+    "minified": 2692,
+    "gzipped": 1033
+  },
+  "dist\\vue-signature-canvas.esm.js": {
+    "bundled": 2840,
+    "minified": 2477,
+    "gzipped": 944,
+    "treeshaked": {
+      "rollup": {
+        "code": 2288,
+        "import_statements": 56
+      },
+      "webpack": {
+        "code": 3321
+      }
+    }
+  }
+}

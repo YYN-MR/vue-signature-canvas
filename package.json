@@ -1,0 +1,107 @@
+{
+  "name": "vue-signature-canvas",
+  "description": "SignatureCanvas component for Vue.js",
+  "version": "1.0.0",
+  "main": "dist/vue-signature-canvas.common.js",
+  "unpkg": "dist/vue-signature-canvas.js",
+  "module": "dist/vue-signature-canvas.esm.js",
+  "browser": "dist/vue-signature-canvas.common.js",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build:dev": "npm run clean && cross-env NODE_ENV=development rollup -c",
+    "build:prod": "npm run clean && cross-env NODE_ENV=production rollup -c",
+    "lint": "eslint --ext .vue,.js src",
+    "lint-fix": "eslint --ext .vue,.js src --fix",
+    "size": "run-s size:*",
+    "size:cjs": "echo CommonJs gzipped size: $(gzip-size $npm_package_main)",
+    "size:unpkg": "echo UMD gzipped size: $(gzip-size $npm_package_unpkg)",
+    "size:esm": "echo ESModule gzipped size: $(gzip-size $npm_package_module)",
+    "clean": "rimraf dist",
+    "prepare": "npm run build:prod",
+    "prepublishOnly": "npm test && npm run lint"
+  },
+  "jest": {
+    "moduleFileExtensions": [
+      "js",
+      "vue"
+    ],
+    "testMatch": [
+      "<rootDir>/src/*/__tests__/*.spec.js"
+    ],
+    "transform": {
+      "^.+\\.js$": "<rootDir>/node_modules/babel-jest"
+    },
+    "moduleNameMapper": {
+      "^@/(.*)$": "<rootDir>/src/$1"
+    },
+    "verbose": true,
+    "collectCoverage": true,
+    "setupFiles": [
+      "jest-canvas-mock"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "pre-push": "npm run test",
+      "pre-publish": "npm run lint && npm run build:prod"
+    }
+  },
+  "lint-staged": {
+    "*.{js,vue}": [
+      "eslint --fix"
+    ]
+  },
+  "author": "Sky<Sky@javadesign.com> (https://github.com/YYN-MR)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/YYN-MR/vue-signature-canvas.git"
+  },
+  "keywords": [
+    "vue",
+    "signature",
+    "component"
+  ],
+  "bugs": {
+    "url": "https://github.com/YYN-MR/vue-signature-canvas/issues"
+  },
+  "dependencies": {
+    "signature_pad": "^3.0.0-beta.3",
+    "vue": "^2.6.11",
+    "trim-canvas": "^0.1.2"
+  },
+  "devDependencies": {
+    "@babel/core": "7.8.7",
+    "@babel/plugin-proposal-object-rest-spread": "7.8.3",
+    "@babel/preset-env": "7.8.7",
+    "@rollup/plugin-buble": "0.21.1",
+    "@rollup/plugin-commonjs": "11.0.2",
+    "@rollup/plugin-node-resolve": "7.1.1",
+    "@rollup/plugin-replace": "2.3.1",
+    "@vue/test-utils": "1.0.0-beta.32",
+    "babel-eslint": "10.1.0",
+    "babel-jest": "25.1.0",
+    "cross-env": "7.0.2",
+    "eslint": "6.8.0",
+    "eslint-config-prettier": "6.10.0",
+    "eslint-plugin-prettier": "3.1.2",
+    "eslint-plugin-vue": "6.2.2",
+    "husky": "4.2.3",
+    "jest": "25.1.0",
+    "jest-canvas-mock": "2.2.0",
+    "lint-staged": "10.0.8",
+    "npm-run-all": "4.1.5",
+    "prettier": "1.19.1",
+    "rimraf": "3.0.2",
+    "rollup": "2.0.5",
+    "rollup-plugin-babel-minify": "9.1.1",
+    "rollup-plugin-size-snapshot": "0.11.0",
+    "vue-template-compiler": "2.6.11"
+  },
+  "engines": {
+    "node": ">=8"
+  },
+  "license": "MIT"
+}
