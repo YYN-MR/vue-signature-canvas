@@ -139,12 +139,6 @@ export default {
   render(createElement) {
     const { canvasProps } = this;
     console.log(canvasProps);
-    return createElement(
-      'canvas',
-      {
-        ...canvasProps,
-        ref: 'canvas'
-      }
-    );
+    return createElement('canvas', { ...canvasProps, ref: 'canvas' });
   }
 };
