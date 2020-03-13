@@ -8,6 +8,7 @@
 $ npm i vue-signature-canvas
 ```
 
+
 ## Usage
 
 ```js
