@@ -119,6 +119,7 @@ The API methods are _mostly_ just wrappers around [`signature_pad`'s API](https:
 ## Thanks
 
 [neighborhood999/vue-signature-pad](https://github.com/neighborhood999/vue-signature-pad) - Vue Signature Pad Component
+
 [agilgur5/react-signature-canvas](https://codesandbox.io/s/github/agilgur5/react-signature-canvas) - React Signature Canvas Component
 
 ## LICENSE
