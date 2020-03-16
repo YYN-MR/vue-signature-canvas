@@ -24,26 +24,26 @@
     }
   },
   "dist\\vue-signature-canvas.common.js": {
-    "bundled": 2974,
-    "minified": 2608,
-    "gzipped": 990
+    "bundled": 2989,
+    "minified": 2623,
+    "gzipped": 996
   },
   "dist\\vue-signature-canvas.js": {
-    "bundled": 3053,
-    "minified": 2692,
-    "gzipped": 1033
+    "bundled": 3068,
+    "minified": 2707,
+    "gzipped": 1037
   },
   "dist\\vue-signature-canvas.esm.js": {
-    "bundled": 2840,
-    "minified": 2477,
-    "gzipped": 944,
+    "bundled": 2855,
+    "minified": 2492,
+    "gzipped": 950,
     "treeshaked": {
       "rollup": {
-        "code": 2288,
+        "code": 2303,
         "import_statements": 56
       },
       "webpack": {
-        "code": 3321
+        "code": 3336
       }
     }
   }

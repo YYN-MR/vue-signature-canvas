@@ -1,5 +1,5 @@
 import SignaturePad from 'signature_pad';
-import trimCanvas from 'trim-canvas'
+import trimCanvas from 'trim-canvas';
 
 export default {
   name: 'VueSignatureCanvas',
@@ -61,7 +61,7 @@ export default {
   },
   methods: {
     _excludeOurProps: function() {
-      const { canvasProps, clearOnResize, ...sigPadProps} = this;
+      const { canvasProps, clearOnResize, ...sigPadProps } = this;
       return sigPadProps;
     },
     _resizeCanvas: function() {

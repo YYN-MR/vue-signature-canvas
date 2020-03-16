@@ -1,7 +1,7 @@
 {
   "name": "vue-signature-canvas",
   "description": "SignatureCanvas component for Vue.js",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "dist/vue-signature-canvas.common.js",
   "unpkg": "dist/vue-signature-canvas.js",
   "module": "dist/vue-signature-canvas.esm.js",
