@@ -16,7 +16,7 @@ env:
 - CXX=g++-4.9
 
 node_js:
-  - '10'
+  - '18'
 
 cache:
   yarn: true

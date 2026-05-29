@@ -1,54 +1,56 @@
-import pkg from './package.json';
-import bubble from '@rollup/plugin-buble';
-import minify from 'rollup-plugin-babel-minify';
+import { createRequire } from 'node:module';
 import replace from '@rollup/plugin-replace';
 import commonjs from '@rollup/plugin-commonjs';
 import nodeResolve from '@rollup/plugin-node-resolve';
-import { sizeSnapshot } from 'rollup-plugin-size-snapshot';
+import terser from '@rollup/plugin-terser';
+import typescript from '@rollup/plugin-typescript';
+
+const require = createRequire(import.meta.url);
+const pkg = require('./package.json');
 
 const globals = {
+  vue: 'Vue',
   signature_pad: 'SignaturePad',
-  'trim-canvas': 'trimCanvas'
+  'trim-canvas': 'trimCanvas',
 };
 const isProduction = process.env.NODE_ENV === 'production';
 
 const config = {
-  input: 'src/index.js',
-  external: ['signature_pad', 'trim-canvas'],
+  input: 'src/index.ts',
+  external: ['vue', 'signature_pad', 'trim-canvas'],
   plugins: [
-    bubble({
-      exclude: 'node_modules/**',
-      objectAssign: true
-    }),
-    nodeResolve({ browser: true }),
+    nodeResolve({ browser: true, extensions: ['.mjs', '.js', '.json', '.ts'] }),
+    typescript({ tsconfig: './tsconfig.json' }),
     commonjs({
-      include: 'node_modules/**'
-    })
+      include: 'node_modules/**',
+    }),
   ],
   output: [
-    { file: pkg.main, format: 'cjs', globals },
+    { file: pkg.main, format: 'cjs', exports: 'default', globals },
     {
       file: pkg.module,
       format: 'es',
-      globals
+      globals,
     },
     {
       file: pkg.unpkg,
       format: 'umd',
-      name: 'vue-signature-canvas',
-      globals
-    }
-  ]
+      name: 'VueSignatureCanvas',
+      globals,
+    },
+  ],
 };
 
 if (isProduction) {
   config.plugins.push(
     replace({
-      'process.env.NODE_ENV': JSON.stringify('production')
-    })
+      preventAssignment: true,
+      values: {
+        'process.env.NODE_ENV': JSON.stringify('production'),
+      },
+    }),
   );
-  config.plugins.push(minify());
-  config.plugins.push(sizeSnapshot());
+  config.plugins.push(terser());
 }
 
 export default config;

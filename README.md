@@ -1,6 +1,8 @@
 # Vue Signature Canvas
 
-> Vue component wrap for [signature pad](https://github.com/szimek/signature_pad)
+Vue 3 signature pad component based on [signature_pad](https://github.com/szimek/signature_pad).
+
+[中文说明](./README.zh-CN.md)
 
 <!-- releases / versioning -->
 [![package-json](https://img.shields.io/github/package-json/v/YYN-MR/vue-signature-canvas.svg)](https://npmjs.org/package/vue-signature-canvas)
@@ -16,87 +18,97 @@
 ## Installation
 
 ```sh
-$ npm i vue-signature-canvas
+npm i vue-signature-canvas
 ```
+
+This package targets Vue 3.
+
+Since v2.0.0:
+
+- Vue 2 is not supported
+- TypeScript typings are provided
+- `options` is the only way to pass `signature_pad` options (legacy props removed)
 
 
 ## Usage
 
 ```js
-import Vue from 'vue';
 import VueSignatureCanvas from 'vue-signature-canvas';
+import { createApp } from 'vue';
+import App from './App.vue';
 
-Vue.use(VueSignatureCanvas);
+const app = createApp(App);
+app.use(VueSignatureCanvas);
+app.mount('#app');
+```
+
+## Demo
+
+Build the library first, then open [demo/index.html](./demo/index.html) in the browser.
+
+```sh
+npm run build:prod
 ```
 
 ```vue
 <template>
   <div id="app">
     <VueSignatureCanvas
-                    ref="handWrite"
-                    :canvasProps="{class: 'sig-canvas'}"
+      ref="signatureRef"
+      :canvasProps="{ class: 'sig-canvas' }"
+      :options="{ penColor: '#09f', throttle: 7 }"
+      @begin="onBegin"
+      @end="onEnd"
     />
   </div>
 </template>
 <script>
-import VueSignatureCanvas from "VueSignatureCanvas";
+import VueSignatureCanvas from 'vue-signature-canvas';
 export default {
   name: 'FirstSignatureCanvas',
   methods: {
-    
+    onBegin() {},
+    onEnd() {},
   },
   components: {
-    VueSignatureCanvas
-  }
+    VueSignatureCanvas,
+  },
 };
 </script>
 <style lang="less" scoped>
-    .sig-canvas {
-        width: 100%;
-        height: 100%;
-        background-color: rgba(244,244,244,0);
-        position: fixed;
-        z-index: 9;
-    }
+.sig-canvas {
+  width: 100%;
+  height: 100%;
+  background-color: rgba(244, 244, 244, 0);
+  position: fixed;
+  z-index: 9;
+}
 </style>
 ```
 
-### Props
+## Props
 
-The props of SignatureCanvas mainly control the properties of the pen stroke used in drawing.
-All props are **optional**.
+All props are optional.
 
-- `velocityFilterWeight` : `number`, default: `0.7`
-- `minWidth` : `number`, default: `0.5`
-- `maxWidth` : `number`, default: `2.5`
-- `minDistance`: `number`, default: `5`
-- `dotSize` : `number` or `function`,
-  default: `() => (this.minWidth + this.maxWidth) / 2`
-- `penColor` : `string`, default: `'black'`
-- `throttle`: `number`, default: `16`
-
-There are also two callbacks that will be called when a stroke ends and one begins, respectively.
-
-- `onEnd` : `function`
-- `onBegin` : `function`
-
-Additional props are used to control the canvas element.
+- `options`: `object`
+  - the only way to pass `signature_pad` options in v2
 
 - `canvasProps`: `object`
   - directly passed to the underlying `<canvas />` element
-- `backgroundColor` : `string`, default: `'rgba(0,0,0,0)'`
-  - used in the API's`clear` convenience method (which itself is called internally during resizes)
 - `clearOnResize`: `bool`, default: `true`
   - whether or not the canvas should be cleared when the window resizes
 
-Of these props, all, except for `canvasProps` and `clearOnResize`, are passed through to `signature_pad` as its [options](https://github.com/szimek/signature_pad#options).
-`signature_pad`'s internal state is automatically kept in sync with prop updates for you (via a `componentDidUpdate` hook).
+`signature_pad`'s internal state is automatically kept in sync with prop updates for you.
+
+## Events
+
+- `begin`: emitted when a stroke begins (same timing as `signature_pad` option `onBegin`)
+- `end`: emitted when a stroke ends (same timing as `signature_pad` option `onEnd`)
 
 ## API
 All API methods require a ref to the SignatureCanvas in order to use and are instance methods of the ref.
 
 - `isEmpty()` : `boolean`, self-explanatory
-- `clear()` : `void`, clears the canvas using the `backgroundColor` prop
 - `fromDataURL(base64String, options)` : `void`, writes a base64 image to canvas
 - `toDataURL(mimetype, encoderOptions)`: `base64string`, returns the signature image as a data URL
 - `fromData(pointGroupArray)`: `void`, draws signature image from an array of point groups

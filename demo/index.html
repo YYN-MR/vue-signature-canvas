@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>vue-signature-canvas demo</title>
+    <style>
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        background: #0b0d12;
+        color: #e8eaf1;
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial,
+          sans-serif;
+      }
+
+      .page {
+        min-height: 100%;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .header {
+        padding: 16px 18px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .title {
+        font-size: 14px;
+        letter-spacing: 0.3px;
+        opacity: 0.9;
+      }
+
+      .actions {
+        display: flex;
+        gap: 10px;
+      }
+
+      .btn {
+        height: 34px;
+        padding: 0 12px;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(255, 255, 255, 0.06);
+        color: #e8eaf1;
+        cursor: pointer;
+      }
+
+      .btn.primary {
+        background: rgba(10, 132, 255, 0.22);
+        border-color: rgba(10, 132, 255, 0.35);
+      }
+
+      .content {
+        padding: 18px;
+        display: grid;
+        grid-template-columns: 1.6fr 1fr;
+        gap: 14px;
+        flex: 1;
+        min-height: 0;
+      }
+
+      .canvasWrap {
+        min-height: 420px;
+        background: radial-gradient(
+            1200px 600px at 20% 10%,
+            rgba(10, 132, 255, 0.18),
+            transparent 40%
+          ),
+          rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 14px;
+        padding: 12px;
+      }
+
+      .canvasEl {
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 12px;
+      }
+
+      .panel {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 14px;
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        overflow: auto;
+        min-height: 0;
+      }
+
+      .row {
+        display: grid;
+        grid-template-columns: 120px 1fr;
+        gap: 10px;
+        align-items: center;
+      }
+
+      .label {
+        font-size: 12px;
+        opacity: 0.8;
+      }
+
+      .input {
+        height: 34px;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(0, 0, 0, 0.25);
+        color: #e8eaf1;
+        padding: 0 10px;
+      }
+
+      .textarea {
+        width: 100%;
+        height: 180px;
+        resize: none;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(0, 0, 0, 0.25);
+        color: #e8eaf1;
+        padding: 10px;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+          'Liberation Mono', 'Courier New', monospace;
+        font-size: 12px;
+        line-height: 1.4;
+      }
+
+      .mono {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+          'Liberation Mono', 'Courier New', monospace;
+        font-size: 12px;
+        opacity: 0.9;
+        word-break: break-all;
+      }
+
+      @media (max-width: 980px) {
+        .content {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+
+    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+    <script src="https://unpkg.com/signature_pad@3.0.0-beta.3/dist/signature_pad.umd.min.js"></script>
+    <script src="https://unpkg.com/trim-canvas@0.1.2/build/index.js"></script>
+    <script src="../dist/vue-signature-canvas.js"></script>
+    <script>
+      const { createApp, ref, computed } = Vue;
+
+      createApp({
+        setup() {
+          const sigRef = ref(null);
+
+          const penColor = ref('#0a84ff');
+          const minWidth = ref(0.5);
+          const maxWidth = ref(2.5);
+          const throttle = ref(16);
+          const enabled = ref(true);
+          const lastEvent = ref('ready');
+          const exportedDataUrl = ref('');
+
+          const options = computed(() => {
+            return {
+              penColor: penColor.value,
+              minWidth: minWidth.value,
+              maxWidth: maxWidth.value,
+              throttle: throttle.value,
+            };
+          });
+
+          const canvasProps = computed(() => {
+            return {
+              class: 'canvasEl',
+              style: 'width: 100%; height: 100%;',
+            };
+          });
+
+          const onBegin = () => {
+            lastEvent.value = 'begin';
+          };
+
+          const onEnd = () => {
+            lastEvent.value = 'end';
+          };
+
+          const clear = () => {
+            sigRef.value?.clear?.();
+            exportedDataUrl.value = '';
+            lastEvent.value = 'clear';
+          };
+
+          const toggle = () => {
+            enabled.value = !enabled.value;
+            if (enabled.value) {
+              sigRef.value?.on?.();
+              lastEvent.value = 'enabled';
+              return;
+            }
+            sigRef.value?.off?.();
+            lastEvent.value = 'disabled';
+          };
+
+          const exportPng = () => {
+            exportedDataUrl.value =
+              sigRef.value?.toDataURL?.('image/png') || '';
+            lastEvent.value = 'export';
+          };
+
+          return {
+            sigRef,
+            penColor,
+            minWidth,
+            maxWidth,
+            throttle,
+            enabled,
+            lastEvent,
+            exportedDataUrl,
+            options,
+            canvasProps,
+            onBegin,
+            onEnd,
+            clear,
+            toggle,
+            exportPng,
+          };
+        },
+        template: `
+          <div class="page">
+            <header class="header">
+              <div class="title">vue-signature-canvas static demo</div>
+              <div class="actions">
+                <button class="btn" type="button" @click="clear">Clear</button>
+                <button class="btn" type="button" @click="toggle">
+                  {{ enabled ? 'Disable' : 'Enable' }}
+                </button>
+                <button class="btn primary" type="button" @click="exportPng">Export PNG</button>
+              </div>
+            </header>
+
+            <section class="content">
+              <div class="canvasWrap">
+                <vue-signature-canvas
+                  ref="sigRef"
+                  :options="options"
+                  :canvas-props="canvasProps"
+                  :clear-on-resize="true"
+                  @begin="onBegin"
+                  @end="onEnd"
+                />
+              </div>
+
+              <div class="panel">
+                <div class="row">
+                  <label class="label">Pen color</label>
+                  <input v-model="penColor" class="input" type="color" />
+                </div>
+                <div class="row">
+                  <label class="label">Min width</label>
+                  <input v-model.number="minWidth" class="input" type="number" step="0.1" min="0" />
+                </div>
+                <div class="row">
+                  <label class="label">Max width</label>
+                  <input v-model.number="maxWidth" class="input" type="number" step="0.1" min="0" />
+                </div>
+                <div class="row">
+                  <label class="label">Throttle</label>
+                  <input v-model.number="throttle" class="input" type="number" step="1" min="0" />
+                </div>
+                <div class="row">
+                  <label class="label">Last event</label>
+                  <div class="mono">{{ lastEvent }}</div>
+                </div>
+                <div class="row">
+                  <label class="label">Export</label>
+                  <textarea class="textarea" readonly :value="exportedDataUrl"></textarea>
+                </div>
+              </div>
+            </section>
+          </div>
+        `,
+      })
+        .use(VueSignatureCanvas)
+        .mount('#app');
+    </script>
+  </body>
+</html>
