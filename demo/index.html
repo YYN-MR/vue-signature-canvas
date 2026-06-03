@@ -117,6 +117,12 @@
         padding: 0 10px;
       }
 
+      .check {
+        width: 18px;
+        height: 18px;
+        accent-color: #0a84ff;
+      }
+
       .textarea {
         width: 100%;
         height: 180px;
@@ -169,12 +175,71 @@
           const lastEvent = ref('ready');
           const exportedDataUrl = ref('');
 
+          const gridEnabled = ref(true);
+          const gridMode = ref('zheng');
+          const gridSize = ref(24);
+          const gridColor = ref('rgba(255, 255, 255, 0.15)');
+          const gridDash = ref('4,4');
+          const gridLineWidth = ref(1);
+
+          const guideEnabled = ref(true);
+          const guideText = ref('张三');
+          const guideFont = ref('');
+          const guideColor = ref('#ff4d4f');
+          const guideOpacity = ref(0.35);
+          const guideDash = ref('6,6');
+          const guideLineWidth = ref(2);
+
+          const parseDash = (value) => {
+            if (value == null || String(value).trim() === '') {
+              return [];
+            }
+
+            const parts = String(value)
+              .split(',')
+              .map((v) => Number(v.trim()))
+              .filter((n) => Number.isFinite(n) && n >= 0);
+
+            return parts;
+          };
+
           const options = computed(() => {
             return {
               penColor: penColor.value,
               minWidth: minWidth.value,
               maxWidth: maxWidth.value,
               throttle: throttle.value,
+            };
+          });
+
+          const grid = computed(() => {
+            if (!gridEnabled.value) {
+              return false;
+            }
+
+            return {
+              mode: gridMode.value,
+              size: gridSize.value,
+              color: gridColor.value,
+              dash: parseDash(gridDash.value),
+              lineWidth: gridLineWidth.value,
+            };
+          });
+
+          const guide = computed(() => {
+            if (!guideEnabled.value) {
+              return null;
+            }
+
+            return {
+              text: guideText.value,
+              ...(String(guideFont.value || '').trim()
+                ? { font: guideFont.value }
+                : {}),
+              color: guideColor.value,
+              opacity: guideOpacity.value,
+              dash: parseDash(guideDash.value),
+              lineWidth: guideLineWidth.value,
             };
           });
 
@@ -225,7 +290,22 @@
             enabled,
             lastEvent,
             exportedDataUrl,
+            gridEnabled,
+            gridMode,
+            gridSize,
+            gridColor,
+            gridDash,
+            gridLineWidth,
+            guideEnabled,
+            guideText,
+            guideFont,
+            guideColor,
+            guideOpacity,
+            guideDash,
+            guideLineWidth,
             options,
+            grid,
+            guide,
             canvasProps,
             onBegin,
             onEnd,
@@ -254,6 +334,8 @@
                   :options="options"
                   :canvas-props="canvasProps"
                   :clear-on-resize="true"
+                  :grid="grid"
+                  :guide="guide"
                   @begin="onBegin"
                   @end="onEnd"
                 />
@@ -277,12 +359,71 @@
                   <input v-model.number="throttle" class="input" type="number" step="1" min="0" />
                 </div>
                 <div class="row">
+                  <label class="label">Grid</label>
+                  <input v-model="gridEnabled" class="check" type="checkbox" />
+                </div>
+                <div class="row">
+                  <label class="label">Grid mode</label>
+                  <select v-model="gridMode" class="input">
+                    <option value="square">square</option>
+                    <option value="zheng">zheng</option>
+                  </select>
+                </div>
+                <div class="row">
+                  <label class="label">Grid size</label>
+                  <input v-model.number="gridSize" class="input" type="number" step="1" min="4" />
+                </div>
+                <div class="row">
+                  <label class="label">Grid color</label>
+                  <input v-model="gridColor" class="input" type="text" />
+                </div>
+                <div class="row">
+                  <label class="label">Grid dash</label>
+                  <input v-model="gridDash" class="input" type="text" />
+                </div>
+                <div class="row">
+                  <label class="label">Grid width</label>
+                  <input v-model.number="gridLineWidth" class="input" type="number" step="1" min="1" />
+                </div>
+                <div class="row">
+                  <label class="label">Guide</label>
+                  <input v-model="guideEnabled" class="check" type="checkbox" />
+                </div>
+                <div class="row">
+                  <label class="label">Guide text</label>
+                  <textarea v-model="guideText" class="textarea" style="height: 70px;"></textarea>
+                </div>
+                <div class="row">
+                  <label class="label">Guide font</label>
+                  <input v-model="guideFont" class="input" type="text" />
+                </div>
+                <div class="row">
+                  <label class="label">Guide color</label>
+                  <input v-model="guideColor" class="input" type="color" />
+                </div>
+                <div class="row">
+                  <label class="label">Guide opacity</label>
+                  <input v-model.number="guideOpacity" class="input" type="number" step="0.05" min="0" max="1" />
+                </div>
+                <div class="row">
+                  <label class="label">Guide dash</label>
+                  <input v-model="guideDash" class="input" type="text" />
+                </div>
+                <div class="row">
+                  <label class="label">Guide width</label>
+                  <input v-model.number="guideLineWidth" class="input" type="number" step="1" min="1" />
+                </div>
+                <div class="row">
                   <label class="label">Last event</label>
                   <div class="mono">{{ lastEvent }}</div>
                 </div>
                 <div class="row">
-                  <label class="label">Export</label>
+                  <label class="label">Export (strokes)</label>
                   <textarea class="textarea" readonly :value="exportedDataUrl"></textarea>
+                </div>
+                <div class="row">
+                  <label class="label">Export note</label>
+                  <div class="mono">Grid/guide are not included in toDataURL() exports.</div>
                 </div>
               </div>
             </section>

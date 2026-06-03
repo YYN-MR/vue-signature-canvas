@@ -97,8 +97,24 @@ All props are optional.
   - directly passed to the underlying `<canvas />` element
 - `clearOnResize`: `bool`, default: `true`
   - whether or not the canvas should be cleared when the window resizes
+- `grid`: `boolean | object`, default: `false`
+  - draws a dashed grid on a background canvas to help align handwriting
+  - `mode`: `'square' | 'zheng'` (default: `'square'`)
+- `guide`: `object | null`, default: `null`
+  - draws outlined guide text (e.g. a name) on a background canvas
+  - `font`: `string` (optional). If omitted, the component picks a best-fit font size to fill the canvas. For CJK text it prefers `SimSun` by default.
 
 `signature_pad`'s internal state is automatically kept in sync with prop updates for you.
+
+`grid` / `guide` are drawn on a separate background canvas and are NOT included in `toDataURL()` exports.
+
+```vue
+<VueSignatureCanvas
+  :options="{ penColor: '#09f', throttle: 7 }"
+  :grid="{ mode: 'zheng', size: 24, color: 'rgba(0, 0, 0, 0.15)', dash: [4, 4], lineWidth: 1 }"
+  :guide="{ text: 'John Doe', font: '64px sans-serif', color: '#ff4d4f', opacity: 0.35 }"
+/>
+```
 
 ## Events
 
