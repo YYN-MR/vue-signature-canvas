@@ -82,8 +82,24 @@ export default {
   - 透传给底层 `<canvas />` 的属性
 - `clearOnResize`: `bool`，默认 `true`
   - window resize 时是否清空画布
+- `grid`: `bool | object`，默认 `false`
+  - 虚线网格背景（用于辅助对齐书写）
+  - `mode`: `'square' | 'zheng'`（默认 `'square'`，`zheng` 为字帖“正字格/米字格”内线）
+- `guide`: `object | null`，默认 `null`
+  - 姓名/文字描红引导（按轨迹书写）
+  - `font`: `string`（可选）。不传时会自动计算“尽可能填充画布”的字号；若文本包含中文/日文/韩文字符，默认优先使用宋体（SimSun）。
 
 组件会在 props 更新时自动同步 `signature_pad` 内部配置。
+
+`grid` / `guide` 绘制在独立的“背景层 canvas”上，`toDataURL()` 导出不包含这些背景内容。
+
+```vue
+<VueSignatureCanvas
+  :options="{ penColor: '#09f', throttle: 7 }"
+  :grid="{ mode: 'zheng', size: 24, color: 'rgba(0, 0, 0, 0.15)', dash: [4, 4], lineWidth: 1 }"
+  :guide="{ text: '张三', font: '64px sans-serif', color: '#ff4d4f', opacity: 0.35 }"
+/>
+```
 
 ## 事件
 

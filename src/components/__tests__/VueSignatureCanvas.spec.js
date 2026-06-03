@@ -31,6 +31,12 @@ afterEach(() => {
 });
 
 describe('VueSignatureCanvas (Vue3)', () => {
+  const getSignatureCanvas = (wrapper) =>
+    wrapper.find('[data-vsc-canvas="signature"]').element;
+
+  const getBackgroundCanvas = (wrapper) =>
+    wrapper.find('[data-vsc-canvas="background"]').element;
+
   it('supports options prop as primary signature_pad config', async () => {
     const wrapper = mount(VueSignatureCanvas, {
       props: {
@@ -41,7 +47,7 @@ describe('VueSignatureCanvas (Vue3)', () => {
       },
     });
 
-    const canvas = wrapper.find('canvas').element;
+    const canvas = getSignatureCanvas(wrapper);
     Object.defineProperty(canvas, 'offsetWidth', {
       value: 300,
       configurable: true,
@@ -70,7 +76,7 @@ describe('VueSignatureCanvas (Vue3)', () => {
       },
     });
 
-    const canvas = wrapper.find('canvas').element;
+    const canvas = getSignatureCanvas(wrapper);
     Object.defineProperty(canvas, 'offsetWidth', {
       value: 300,
       configurable: true,
@@ -95,7 +101,7 @@ describe('VueSignatureCanvas (Vue3)', () => {
       props: { options: { penColor: '#000' } },
     });
 
-    const canvas = wrapper.find('canvas').element;
+    const canvas = getSignatureCanvas(wrapper);
     Object.defineProperty(canvas, 'offsetWidth', {
       value: 300,
       configurable: true,
@@ -119,7 +125,7 @@ describe('VueSignatureCanvas (Vue3)', () => {
   it('emits begin/end events from options callbacks', async () => {
     const wrapper = mount(VueSignatureCanvas, { props: { options: {} } });
 
-    const canvas = wrapper.find('canvas').element;
+    const canvas = getSignatureCanvas(wrapper);
     Object.defineProperty(canvas, 'offsetWidth', {
       value: 300,
       configurable: true,
@@ -147,7 +153,7 @@ describe('VueSignatureCanvas (Vue3)', () => {
       },
     });
 
-    const canvas = wrapper.find('canvas').element;
+    const canvas = getSignatureCanvas(wrapper);
     Object.defineProperty(canvas, 'offsetWidth', {
       value: 300,
       configurable: true,
@@ -168,7 +174,7 @@ describe('VueSignatureCanvas (Vue3)', () => {
   it('exposes API methods through component ref', async () => {
     const wrapper = mount(VueSignatureCanvas);
 
-    const canvas = wrapper.find('canvas').element;
+    const canvas = getSignatureCanvas(wrapper);
     Object.defineProperty(canvas, 'offsetWidth', {
       value: 300,
       configurable: true,
@@ -201,7 +207,7 @@ describe('VueSignatureCanvas (Vue3)', () => {
 
     const wrapper = mount(VueSignatureCanvas);
 
-    const canvas = wrapper.find('canvas').element;
+    const canvas = getSignatureCanvas(wrapper);
     Object.defineProperty(canvas, 'offsetWidth', {
       value: 300,
       configurable: true,
@@ -218,5 +224,93 @@ describe('VueSignatureCanvas (Vue3)', () => {
 
     wrapper.unmount();
     expect(removeSpy).toHaveBeenCalledWith('resize', expect.any(Function));
+  });
+
+  it('draws dashed grid on background canvas when grid enabled', async () => {
+    const wrapper = mount(VueSignatureCanvas, {
+      props: {
+        grid: true,
+      },
+    });
+
+    const signatureCanvas = getSignatureCanvas(wrapper);
+    Object.defineProperty(signatureCanvas, 'offsetWidth', {
+      value: 300,
+      configurable: true,
+    });
+    Object.defineProperty(signatureCanvas, 'offsetHeight', {
+      value: 150,
+      configurable: true,
+    });
+
+    await wrapper.vm.$nextTick();
+    await wrapper.vm.$nextTick();
+
+    const backgroundCanvas = getBackgroundCanvas(wrapper);
+    const bgCtx = backgroundCanvas.getContext('2d');
+
+    expect(bgCtx.setLineDash).toHaveBeenCalled();
+    expect(bgCtx.stroke).toHaveBeenCalled();
+  });
+
+  it('draws zheng grid (calligraphy) inner lines when mode is zheng', async () => {
+    const wrapper = mount(VueSignatureCanvas, {
+      props: {
+        grid: {
+          mode: 'zheng',
+          size: 100,
+        },
+      },
+    });
+
+    const signatureCanvas = getSignatureCanvas(wrapper);
+    Object.defineProperty(signatureCanvas, 'offsetWidth', {
+      value: 300,
+      configurable: true,
+    });
+    Object.defineProperty(signatureCanvas, 'offsetHeight', {
+      value: 150,
+      configurable: true,
+    });
+
+    await wrapper.vm.$nextTick();
+    await wrapper.vm.$nextTick();
+
+    const backgroundCanvas = getBackgroundCanvas(wrapper);
+    const bgCtx = backgroundCanvas.getContext('2d');
+
+    expect(bgCtx.lineTo).toHaveBeenCalledWith(100, 100);
+    expect(bgCtx.stroke).toHaveBeenCalled();
+  });
+
+  it('draws guide text on background canvas', async () => {
+    const wrapper = mount(VueSignatureCanvas, {
+      props: {
+        guide: {
+          text: '张三',
+        },
+      },
+    });
+
+    const signatureCanvas = getSignatureCanvas(wrapper);
+    Object.defineProperty(signatureCanvas, 'offsetWidth', {
+      value: 300,
+      configurable: true,
+    });
+    Object.defineProperty(signatureCanvas, 'offsetHeight', {
+      value: 150,
+      configurable: true,
+    });
+
+    await wrapper.vm.$nextTick();
+    await wrapper.vm.$nextTick();
+
+    const backgroundCanvas = getBackgroundCanvas(wrapper);
+    const bgCtx = backgroundCanvas.getContext('2d');
+    expect(bgCtx.strokeText).toHaveBeenCalledWith(
+      '张三',
+      expect.any(Number),
+      expect.any(Number),
+    );
   });
 });
